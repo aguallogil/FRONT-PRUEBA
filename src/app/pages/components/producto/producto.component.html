@@ -1,0 +1,91 @@
+<dx-toolbar>
+    <dxi-item location="before" widget="dxButton" [options]="backButtonOptions">
+    </dxi-item>
+    <dxi-item location="before" widget="dxButton" locateInMenu="auto" [options]="refreshButtonOptions">
+    </dxi-item>
+    <dxi-item location="center" widget="dxButton" locateInMenu="never">
+        <div *dxTemplate>
+            <div class='toolbar-label'><b>Catalogo de Productos</b></div>
+        </div>
+    </dxi-item>
+    <dxi-item location="after" widget="dxButton" locateInMenu="auto" [options]="newOptions">
+    </dxi-item>
+</dx-toolbar>
+<div class="content-block dx-card responsive-paddings">
+    <div class="row">
+        <div class="col-md-12">
+            <dx-data-grid class="dx-card wide-card" [dataSource]="datos" [showBorders]="true"
+                [allowColumnResizing]="true" [wordWrapEnabled]="true" [rowAlternationEnabled]="true"
+                [showRowLines]="true" [showColumnLines]=true #grid id="grid">
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 20, 50, 100, 500]" [showInfo]="true">
+                </dxo-pager>
+                <dxo-export [enabled]="true"></dxo-export>
+                <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+                <dxo-filter-row [visible]="true" [applyFilter]="currentFilter">
+                </dxo-filter-row>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+                <dxo-search-panel [visible]="true" placeholder="Búsqueda...">
+                </dxo-search-panel>
+
+                <dxi-column dataField="id" width="120" caption="Numero"></dxi-column>
+                <dxi-column dataField="de_Producto" caption="Descripcion"></dxi-column>
+                <dxi-column dataField="imp_Precio" caption="Precio"></dxi-column>
+                <dxi-column dataField="nu_Cantidad" caption="Cantidad"></dxi-column>
+                <dxi-column dataField="img_Producto64" [width]="100" caption="Imagen" [allowFiltering]="false"
+                    [allowSorting]="false" cellTemplate="cellTemplate"></dxi-column>
+                <div *dxTemplate="let data of 'cellTemplate'">
+                    <img [src]="data.value" width="50" height="50">
+                </div>
+                <dxi-column caption="Total" [calculateCellValue]="calculateTotal" [format]="{ style: 'currency', currency: 'MXN' }"></dxi-column>
+                <dxi-column type="buttons" [width]="110">
+                    <dxi-button hint="Editar" icon="edit" [onClick]="editClick"></dxi-button>
+                </dxi-column>
+            </dx-data-grid>
+        </div>
+    </div>
+    <dx-popup [showTitle]="true" title="Agregar nuevo Producto" [dragEnabled]="false" [closeOnOutsideClick]="false"
+        [(visible)]="popupNuevoVisible" [height]="500" [width]="800" [showCloseButton]="true">
+        <div id="form-container">
+            <div class="row" style="margin-top: 2%;">
+                <div class="col-md-4">
+                    <div class="label">Descripcion</div>
+                    <dx-text-box [(value)]="producto.de_Producto"></dx-text-box>
+                </div>
+                <div class="col-md-4">
+                    <div class="label">Precio</div>
+                    <dx-number-box [(value)]="producto.imp_Precio" [min]="0"></dx-number-box>
+                </div>
+                <div class="col-md-4">
+                    <div class="label">Cantidad</div>
+                    <dx-number-box [(value)]="producto.nu_Cantidad" [min]="0"></dx-number-box>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 2%;">
+                <div class="col-md-12">
+                    <dxi-item itemType="group" caption="Imagen" name="cv-container" [colSpan]="3">
+                        <div id="fileuploader-container">
+                            <dx-button stylingMode="contained" text="Subir imagen" type="success"
+                                (onClick)="fileInputC.click()">
+                            </dx-button>
+                            <input type="file" style="display: none;" (change)='onFileCotizaSelected($event)'
+                                #fileInputC accept=".png, .jpg, .jpeg">
+
+                            <!-- <dx-data-grid id="gridContainer" [dataSource]="this.archivosC"
+                                [columns]="['archivo', 'size']" [showBorders]="true">
+                            </dx-data-grid> -->
+                            <div class="imagePreview" *ngIf="imageURL && imageURL !== ''">
+                                <img [src]="imageURL" width="300" height="200">
+                            </div>
+                        </div>
+                    </dxi-item>
+
+                </div>
+            </div>
+            <div class="row" style="margin-top: 2%;">
+                <dx-button stylingMode="contained" location="after" text="Guardar" type="default" [width]="200"
+                    (onClick)="guardar($event)">
+                </dx-button>
+            </div>
+        </div>
+    </dx-popup>
+</div>

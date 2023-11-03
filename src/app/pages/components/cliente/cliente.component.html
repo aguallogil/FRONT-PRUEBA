@@ -1,0 +1,73 @@
+<dx-toolbar>
+    <dxi-item location="before" widget="dxButton" [options]="backButtonOptions"></dxi-item>
+    <dxi-item location="before" widget="dxButton" locateInMenu="auto" [options]="refreshButtonOptions"></dxi-item>
+    <dxi-item location="center" widget="dxButton" locateInMenu="never">
+        <div *dxTemplate>
+            <div class='toolbar-label'><b>Catálogo de Clientes</b></div>
+        </div>
+    </dxi-item>
+    <dxi-item location="after" widget="dxButton" locateInMenu="auto" [options]="newOptions"></dxi-item>
+</dx-toolbar>
+
+<div class="content-block dx-card responsive-paddings">
+    <div class="row">
+        <div class="col-md-12">
+            <dx-data-grid class="dx-card wide-card"
+                [dataSource]="datos" [showBorders]="true" [allowColumnResizing]="true" [wordWrapEnabled]="true"
+                [rowAlternationEnabled]="true" [showRowLines]="true" [showColumnLines]="true">
+                
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 20, 50, 100, 500]" [showInfo]="true"></dxo-pager>
+                <dxo-export [enabled]="true"></dxo-export>
+                <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+                <dxo-filter-row [visible]="true" [applyFilter]="currentFilter"></dxo-filter-row>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+                <dxo-search-panel [visible]="true" placeholder="Búsqueda..."></dxo-search-panel>
+
+                <dxi-column dataField="id" width="120" caption="ID"></dxi-column>
+                <dxi-column dataField="de_RazonSocial" caption="Razón Social"></dxi-column>
+                <dxi-column dataField="de_TipoCliente" caption="Tipo de Cliente"></dxi-column>
+                <dxi-column dataField="rfc" caption="RFC"></dxi-column>
+                <dxi-column dataField="fh_Registro" caption="Fecha de Registro" dataType="date"></dxi-column>
+                <dxi-column type="buttons" [width]="110">
+                    <dxi-button hint="Editar" icon="edit" [onClick]="editClick"></dxi-button>
+                </dxi-column>
+            </dx-data-grid>
+        </div>
+    </div>
+
+    <dx-popup [showTitle]="true" title="Agregar nuevo cliente" [dragEnabled]="false"
+        [closeOnOutsideClick]="false" [(visible)]="popupNuevoVisible" [height]="500" [width]="800" [showCloseButton]="true">
+        
+        <div id="form-container">
+            <div class="row" style="margin-top: 2%;">
+                <div class="col-md-6">
+                    <div class="label">Razón Social</div>
+                    <dx-text-box [(value)]="cliente.de_RazonSocial"></dx-text-box>
+                </div>
+                <div class="col-md-6">
+                    <div class="">Tipo de Cliente</div>
+                  <div class="">
+                    <dx-select-box [items]="tiposclientes" 
+                      displayExpr="de_TipoCliente"
+                      [(value)]="cliente.id_TipoCliente"
+                      (onValueChanged)="onValueChanged($event)"
+                      valueExpr="id"></dx-select-box>
+                  </div>
+                </div>
+            </div>
+            
+            <div class="row" style="margin-top: 2%;">
+                <div class="col-md-6">
+                    <div class="label">RFC</div>
+                    <dx-text-box [(value)]="cliente.rfc"></dx-text-box>
+                </div>
+            </div>
+            
+            <div class="row" style="margin-top: 2%;">
+                <dx-button stylingMode="contained" location="after" text="Guardar" type="default" [width]="200"
+                    (onClick)="guardar($event)">
+                </dx-button>
+            </div>
+        </div>
+    </dx-popup>
+</div>

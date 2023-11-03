@@ -1,0 +1,129 @@
+<dx-toolbar>
+    <dxi-item location="before" widget="dxButton" [options]="backButtonOptions"></dxi-item>
+    <dxi-item location="before" widget="dxButton" locateInMenu="auto" [options]="refreshButtonOptions"></dxi-item>
+    <dxi-item location="center" widget="dxButton" locateInMenu="never">
+        <div *dxTemplate>
+            <div class='toolbar-label'><b>Generacion de Facturas</b></div>
+        </div>
+    </dxi-item>
+    <dxi-item location="after" widget="dxButton" locateInMenu="auto" [options]="newOptions"></dxi-item>
+</dx-toolbar>
+<div class="row" style="margin-top: 1%; margin-left: 2%;">
+    <div class="col-md-3">
+        <div class="">Cliente</div>
+        <div class="">
+            <dx-select-box [items]="clientes" displayExpr="de_RazonSocial" [value]="id_Cliente"
+                (onValueChanged)="onValueChangedCliente($event)" valueExpr="id"></dx-select-box>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="">Numero</div>
+        <div class="">
+            <dx-text-box (onValueChanged)="onValueChangedNumero($event)" valueExpr="id" [value]="nu_Factura"></dx-text-box>
+        </div>
+    </div>
+</div>
+<div class="content-block dx-card responsive-paddings">
+    <div class="row">
+        <div class="col-md-12">
+            <dx-data-grid class="dx-card wide-card" [dataSource]="datos" [showBorders]="true" #grid
+                [allowColumnResizing]="true" [wordWrapEnabled]="true" [rowAlternationEnabled]="true"
+                [showRowLines]="true" [showColumnLines]="true">
+
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 20, 50, 100, 500]"
+                    [showInfo]="true"></dxo-pager>
+                <dxo-export [enabled]="true"></dxo-export>
+                <dxo-filter-panel [visible]="true"></dxo-filter-panel>
+                <dxo-filter-row [visible]="true" [applyFilter]="currentFilter"></dxo-filter-row>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+                <dxo-search-panel [visible]="true" placeholder="Búsqueda..."></dxo-search-panel>
+
+                <dxi-column dataField="id" width="120" caption="ID" [visible]="false"></dxi-column>
+                <dxi-column dataField="nu_Factura" caption="Número de Factura"></dxi-column>
+                <dxi-column dataField="fh_Factura" caption="Fecha de Emisión" dataType="date"></dxi-column>
+                <dxi-column dataField="imp_Total" caption="Total Facturado"></dxi-column>
+            </dx-data-grid>
+        </div>
+    </div>
+
+    <dx-popup [showTitle]="true" title="Agregar nueva factura" [dragEnabled]="false" [closeOnOutsideClick]="false"
+        [(visible)]="popupNuevoVisible" [height]="700" [width]="800" [showCloseButton]="true">
+
+        <div id="form-container">
+            <div class="row" style="margin-top: 1%;">
+                <div class="col-md-12">
+                    <div class="">Cliente</div>
+                    <div class="">
+                        <dx-select-box [items]="clientes" displayExpr="de_RazonSocial" [(value)]="factura.id_Cliente"
+                            (onValueChanged)="onValueChanged($event)" valueExpr="id"></dx-select-box>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 2%;">
+                <div class="col-md-6">
+                    <div class="label">Número de Factura</div>
+                    <dx-number-box [(value)]="factura.nu_Factura"></dx-number-box>
+                </div>
+                <div class="col-md-6">
+                    <div class="label">Fecha de Emisión</div>
+                    <dx-date-box [(value)]="fecha">
+                    </dx-date-box>
+                </div>
+            </div>
+            <div class="row" style="margin-left: 1%;">
+                <dx-data-grid class="dx-card wide-card" [dataSource]="productos2" [showBorders]="true"
+                    [allowColumnResizing]="true" [wordWrapEnabled]="true" [rowAlternationEnabled]="true"
+                    (onEditorPreparing)="onEditorPreparing($event)"
+                    (onRowInserted)="actualiza($event)"
+                    (onSaved)="actualiza($event)"
+                    [showRowLines]="true" [showColumnLines]=true #dataGrid2 id="dataGrid2">
+                    <dxo-editing mode="row" [allowUpdating]="true" [allowDeleting]="true" [allowAdding]="true">
+                    </dxo-editing>
+                    <dxi-column dataField="id" caption="Producto" [width]="125">
+                        <dxo-lookup [dataSource]="productos" displayExpr="de_Producto" valueExpr="id">
+                        </dxo-lookup>
+                    </dxi-column>
+                    <dxi-column dataField="de_Producto" caption="Descripcion"></dxi-column>
+                    <dxi-column dataField="imp_Precio" caption="Precio"></dxi-column>
+                    <dxi-column dataField="nu_Cantidad" caption="Cantidad"></dxi-column>
+                   
+                    <dxi-column dataField="img_Producto64" [width]="100" caption="Imagen" [allowFiltering]="false" [allowSorting]="false"
+                        cellTemplate="cellTemplate"></dxi-column>
+                    <div *dxTemplate="let data of 'cellTemplate'">
+                        <img [src]="data.value" width="50" height="50">
+                    </div>
+                    <dxi-column caption="Total" [calculateCellValue]="calculateTotal" [format]="{ style: 'currency', currency: 'MXN' }"></dxi-column>
+                </dx-data-grid>
+
+
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-md-7 col-sm-6">
+                    <dx-button stylingMode="contained" location="after" text="Guardar" type="default" [width]="200"
+                    (onClick)="guardar($event)">
+                </dx-button>
+                </div>
+        
+
+                <div class="col-lg-4 col-md-5 col-sm-6">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="w-50">Subtotal</th>
+                                <th scope="col" class="w-50">${{factura.imp_Subtotal}}</th>
+                            </tr>
+                            <tr>
+                                <th scope="col" class="w-50">Impuestos(19%)</th>
+                                <th scope="col" class="w-50">${{factura.imp_TotalImpuestos}}</th>
+                            </tr>
+                            <tr>
+                                <th scope="col" class="w-50">Total</th>
+                                <th scope="col" class="w-50">${{factura.imp_Total}}</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </dx-popup>
+</div>
